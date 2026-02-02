@@ -62,7 +62,7 @@ Desarrollar un sistema simple por consola que permita:
 
 ## 🗂️ Estructura del proyecto
 
-´´´
+```text
 CafeDonNino/
 │ main.py
 │ README.md
@@ -75,8 +75,7 @@ CafeDonNino/
     │ gestion_datos.py
     │ reportes.py
     │ funciones_utiles.py
-´´´
-
+```
 ---
 
 ## ▶️ Cómo ejecutar el programa
