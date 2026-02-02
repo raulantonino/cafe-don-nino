@@ -3,7 +3,7 @@ Gestión de productos, ventas y stock
 """
 
 from modulos.validaciones import pedir_opcion, pedir_entero, confirmar
-from modulos.utiles import mostrar_carta, mostrar_aviso_stock_bajo, pausa
+from modulos.utiles import mostrar_carta, mostrar_aviso_stock_bajo
 
 
 DESCUENTO_ID = -1  # item especial en carrito
@@ -25,7 +25,6 @@ def buscar_producto_por_nombre(productos, nombre):
 
 
 def agregar_producto_a_carrito(carrito, producto, cantidad):
-    # Si ya existe en carrito, suma
     for item in carrito:
         if item["id"] == producto["id"]:
             item["cantidad"] += cantidad
@@ -74,7 +73,7 @@ def descontar_stock_por_carrito(productos, carrito):
             p["stock"] -= item["cantidad"]
 
 
-def nueva_venta(productos, combos, total_vendido, stock_bajo):
+def nueva_venta(productos, combos, total_vendido, stock_bajo, ventas_por_producto):
     carrito = []
 
     while True:
@@ -85,7 +84,7 @@ def nueva_venta(productos, combos, total_vendido, stock_bajo):
         print("4) Cancelar venta")
         op = pedir_opcion("Elige opción: ", {"1", "2", "3", "4"})
 
-        # 1) Producto
+        # 1) Agregar producto
         if op == "1":
             mostrar_carta(productos, stock_bajo)
 
@@ -104,7 +103,7 @@ def nueva_venta(productos, combos, total_vendido, stock_bajo):
                 print(f"Stock insuficiente. Disponible: {producto['stock']}")
                 continue
 
-            # Si ya estaba en carrito, verificar que no exceda stock
+            # Considerar carrito para no exceder stock
             cantidad_en_carrito = 0
             for it in carrito:
                 if it["id"] == producto["id"]:
@@ -117,7 +116,7 @@ def nueva_venta(productos, combos, total_vendido, stock_bajo):
             agregar_producto_a_carrito(carrito, producto, cantidad)
             print("Producto agregado al carrito.")
 
-        # 2) Combo
+        # 2) Agregar combo
         elif op == "2":
             print("\n=== COMBOS ===")
             for i, c in enumerate(combos, start=1):
@@ -130,44 +129,39 @@ def nueva_venta(productos, combos, total_vendido, stock_bajo):
 
             combo = combos[idx - 1]
 
-            # validar stock para todos los items del combo (1 unidad cada uno)
-            puede = True
+            # Validar stock mínimo (1 unidad por item)
             for pid in combo["items"]:
                 p = buscar_producto_por_id(productos, pid)
                 if not p or p["stock"] < 1:
-                    puede = False
+                    print("No se puede agregar el combo (falta stock de algún producto).")
                     break
-
-            if not puede:
-                print("No se puede agregar el combo (falta stock de algún producto).")
-                continue
-
-            # Agregar 1 unidad de cada producto del combo al carrito
-            for pid in combo["items"]:
-                p = buscar_producto_por_id(productos, pid)
-
-                # verificar que no exceda stock considerando carrito
-                cantidad_en_carrito = 0
-                for it in carrito:
-                    if it["id"] == p["id"]:
-                        cantidad_en_carrito = it["cantidad"]
+            else:
+                # Validar considerando carrito
+                puede = True
+                for pid in combo["items"]:
+                    p = buscar_producto_por_id(productos, pid)
+                    cantidad_en_carrito = 0
+                    for it in carrito:
+                        if it["id"] == p["id"]:
+                            cantidad_en_carrito = it["cantidad"]
+                            break
+                    if cantidad_en_carrito + 1 > p["stock"]:
+                        print(f"No se puede agregar combo: stock insuficiente de {p['nombre']} considerando el carrito.")
+                        puede = False
                         break
-                if cantidad_en_carrito + 1 > p["stock"]:
-                    print(f"No se puede agregar combo: stock insuficiente de {p['nombre']} considerando el carrito.")
-                    puede = False
-                    break
 
-            if not puede:
-                continue
+                if not puede:
+                    continue
 
-            for pid in combo["items"]:
-                p = buscar_producto_por_id(productos, pid)
-                agregar_producto_a_carrito(carrito, p, 1)
+                # Agregar items + descuento
+                for pid in combo["items"]:
+                    p = buscar_producto_por_id(productos, pid)
+                    agregar_producto_a_carrito(carrito, p, 1)
 
-            agregar_descuento_combo(carrito, combo["nombre"], combo["descuento"])
-            print("Combo agregado al carrito.")
+                agregar_descuento_combo(carrito, combo["nombre"], combo["descuento"])
+                print("Combo agregado al carrito.")
 
-        # 3) Finalizar
+        # 3) Finalizar venta
         elif op == "3":
             if not carrito:
                 print("Carrito vacío. No hay nada que vender.")
@@ -180,12 +174,27 @@ def nueva_venta(productos, combos, total_vendido, stock_bajo):
                 print("Venta cancelada.")
                 return total_vendido
 
+            # Descontar stock
             descontar_stock_por_carrito(productos, carrito)
-            total_vendido += total
 
+            # Registrar vendido por producto
+            for item in carrito:
+                if item["id"] == DESCUENTO_ID:
+                    continue
+
+                pid = item["id"]
+                cantidad = item["cantidad"]
+                ingresos = item["precio"] * cantidad
+
+                if pid not in ventas_por_producto:
+                    ventas_por_producto[pid] = {"cantidad": 0, "ingresos": 0}
+                ventas_por_producto[pid]["cantidad"] += cantidad
+                ventas_por_producto[pid]["ingresos"] += ingresos
+
+            total_vendido += total
             print("✅ Venta registrada.")
 
-            # Avisos de stock bajo (solo productos reales)
+            # Avisos stock bajo (una vez por producto)
             vistos = set()
             for item in carrito:
                 if item["id"] == DESCUENTO_ID:
@@ -198,7 +207,6 @@ def nueva_venta(productos, combos, total_vendido, stock_bajo):
                 if p:
                     mostrar_aviso_stock_bajo(p, stock_bajo)
 
-            # ¿Nueva venta o menú?
             print("\n¿Qué deseas hacer ahora?")
             print("1) Nueva venta")
             print("2) Volver al menú")
@@ -208,7 +216,7 @@ def nueva_venta(productos, combos, total_vendido, stock_bajo):
                 continue
             return total_vendido
 
-        # 4) Cancelar
+        # 4) Cancelar venta
         elif op == "4":
             print("Venta cancelada.")
             return total_vendido
@@ -242,11 +250,10 @@ def buscar_producto_interactivo(productos, stock_bajo):
             return
 
 
-def reponer_stock(productos):
+def reponer_stock(productos, stock_bajo):
     while True:
         print("\n=== REPONER STOCK ===")
-        from modulos.utiles import mostrar_carta
-        mostrar_carta(productos, stock_bajo=5)
+        mostrar_carta(productos, stock_bajo)
 
         pid = pedir_entero("ID del producto a reponer: ")
         p = buscar_producto_por_id(productos, pid)
@@ -258,9 +265,9 @@ def reponer_stock(productos):
                 print("Cantidad inválida.")
             else:
                 p["stock"] += cant
-                print("Stock actualizado:")
+                print("✅ Stock actualizado:")
                 from modulos.utiles import mostrar_producto
-                mostrar_producto(p)
+                mostrar_producto(p, marca_stock_bajo=(p["stock"] <= stock_bajo))
 
         print("\n¿Qué deseas hacer ahora?")
         print("1) Reponer otro")
@@ -268,3 +275,43 @@ def reponer_stock(productos):
         op = pedir_opcion("Elige: ", {"1", "2"})
         if op == "2":
             return
+
+
+def administrar_productos(productos, ventas_por_producto):
+    while True:
+        print("\n=== ADMINISTRAR PRODUCTOS ===")
+        print("1) Cambiar precio")
+        print("2) Eliminar producto")
+        print("3) Volver al menú")
+        op = pedir_opcion("Elige: ", {"1", "2", "3"})
+
+        if op == "3":
+            return
+
+        pid = pedir_entero("ID del producto: ")
+        p = buscar_producto_por_id(productos, pid)
+        if not p:
+            print("Producto no encontrado.")
+            continue
+
+        if op == "1":
+            nuevo_precio = pedir_entero("Nuevo precio (CLP): ")
+            if nuevo_precio <= 0:
+                print("Precio inválido.")
+                continue
+            p["precio"] = nuevo_precio
+            print("✅ Precio actualizado.")
+            from modulos.utiles import mostrar_producto
+            mostrar_producto(p)
+
+        elif op == "2":
+            if pid in ventas_por_producto:
+                print("⚠ Este producto aparece en el historial de ventas de esta sesión.")
+                print("Si lo eliminas, en el resumen aparecerá como 'Producto eliminado'.")
+
+            if not confirmar("¿Seguro que deseas eliminar este producto?"):
+                print("Operación cancelada.")
+                continue
+
+            productos.remove(p)
+            print("✅ Producto eliminado.")

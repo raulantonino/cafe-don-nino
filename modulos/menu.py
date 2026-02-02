@@ -15,6 +15,7 @@ def mostrar_menu_principal():
     print("4) Reponer stock")
     print("5) Estado de stock")
     print("6) Resumen de ventas")
-    print("7) Cerrar turno")
+    print("7) Administrar productos")
+    print("8) Cerrar turno")
 
-    return pedir_opcion("Elige una opción: ", {"1", "2", "3", "4", "5", "6", "7"})
+    return pedir_opcion("Elige una opción: ", {"1", "2", "3", "4", "5", "6", "7", "8"})
