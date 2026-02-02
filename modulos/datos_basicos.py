@@ -6,11 +6,11 @@ Datos base del sistema Café Don Nino
 
 def cargar_productos_iniciales():
     """
-    Retorna la lista de productos base.
+    Retorna una lista de productos base.
     Cada producto es un diccionario con:
     id, nombre, categoria, precio, stock
     """
-    productos = [
+    return [
         {"id": 1, "nombre": "Espresso", "categoria": "Bebidas calientes", "precio": 2300, "stock": 30},
         {"id": 2, "nombre": "Americano", "categoria": "Bebidas calientes", "precio": 2500, "stock": 30},
         {"id": 3, "nombre": "Cortado", "categoria": "Bebidas calientes", "precio": 2700, "stock": 25},
@@ -29,18 +29,16 @@ def cargar_productos_iniciales():
         {"id": 13, "nombre": "Café grano 250g", "categoria": "Granos y café", "precio": 7900, "stock": 8},
         {"id": 14, "nombre": "Café molido 250g", "categoria": "Granos y café", "precio": 7500, "stock": 8},
     ]
-    return productos
 
 
 def cargar_combos():
     """
-    Retorna la lista de combos base.
+    Retorna una lista de combos base.
     Cada combo es un diccionario con:
     nombre, items (lista de IDs), descuento
     """
-    combos = [
+    return [
         {"nombre": "Combo Clásico (Americano + Croissant)", "items": [2, 11], "descuento": 300},
         {"nombre": "Combo Dulce (Latte + Muffin)", "items": [4, 10], "descuento": 300},
         {"nombre": "Combo Italiano (Espresso + Torta del día)", "items": [1, 12], "descuento": 300},
     ]
-    return combos
