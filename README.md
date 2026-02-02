@@ -62,6 +62,7 @@ Desarrollar un sistema simple por consola que permita:
 
 ## 🗂️ Estructura del proyecto
 
+´´´
 CafeDonNino/
 │ main.py
 │ README.md
@@ -74,6 +75,7 @@ CafeDonNino/
     │ gestion_datos.py
     │ reportes.py
     │ funciones_utiles.py
+´´´
 
 ---
 
@@ -85,26 +87,21 @@ CafeDonNino/
 ```bash
 python main.py
 
-🧪 Ejemplo de uso
+```
+---
 
-Ingresar al menú Nueva venta
+## 🧪 Ejemplo de uso
 
-Agregar uno o más productos
+- Ingresar al menú Nueva venta
+- Agregar uno o más productos
+- Finalizar y confirmar la venta
+- Revisar Resumen de ventas y Estado de stock
 
-Finalizar y confirmar la venta
+## 👤 Contexto académico
 
-Revisar Resumen de ventas y Estado de stock
-
-👤 Contexto académico
-
-Proyecto desarrollado como ABP para practicar:
-
-Estructuras de datos (listas y diccionarios)
-
-Control de flujo
-
-Funciones con parámetros y retorno
-
-Recursividad
-
-Modularización y buenas prácticas de orden
+- Proyecto desarrollado como ABP para practicar:
+- Estructuras de datos (listas y diccionarios)
+- Control de flujo
+- Funciones con parámetros y retorno
+- Recursividad
+- Modularización y buenas prácticas de orden
