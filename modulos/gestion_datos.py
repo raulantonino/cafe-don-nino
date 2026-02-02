@@ -3,8 +3,11 @@ Gestión de productos, ventas y stock
 """
 
 from modulos.validaciones import pedir_opcion, pedir_entero, confirmar
-from modulos.utiles import mostrar_carta, mostrar_aviso_stock_bajo
-
+from modulos.funciones_utiles import (
+    mostrar_carta,
+    mostrar_aviso_stock_bajo,
+    mostrar_producto,
+)
 
 DESCUENTO_ID = -1  # item especial en carrito
 
@@ -236,7 +239,6 @@ def buscar_producto_interactivo(productos, stock_bajo):
 
         if p:
             print("\nProducto encontrado:")
-            from modulos.utiles import mostrar_producto
             mostrar_producto(p, marca_stock_bajo=(p["stock"] <= stock_bajo))
             mostrar_aviso_stock_bajo(p, stock_bajo)
         else:
@@ -266,7 +268,6 @@ def reponer_stock(productos, stock_bajo):
             else:
                 p["stock"] += cant
                 print("✅ Stock actualizado:")
-                from modulos.utiles import mostrar_producto
                 mostrar_producto(p, marca_stock_bajo=(p["stock"] <= stock_bajo))
 
         print("\n¿Qué deseas hacer ahora?")
@@ -301,7 +302,6 @@ def administrar_productos(productos, ventas_por_producto):
                 continue
             p["precio"] = nuevo_precio
             print("✅ Precio actualizado.")
-            from modulos.utiles import mostrar_producto
             mostrar_producto(p)
 
         elif op == "2":

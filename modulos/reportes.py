@@ -4,7 +4,7 @@ Reportes del sistema
 - Resumen de ventas (opción 6)
 """
 
-from modulos.utiles import mostrar_producto, pausa
+from modulos.funciones_utiles import mostrar_producto, pausa
 
 
 def estado_stock(productos, stock_bajo):
@@ -24,10 +24,7 @@ def resumen_ventas(total_vendido, productos, ventas_por_producto, stock_bajo):
     else:
         mapa = {p["id"]: p for p in productos}
         for pid, info in ventas_por_producto.items():
-            if pid in mapa:
-                nombre = mapa[pid]["nombre"]
-            else:
-                nombre = f"Producto eliminado (ID {pid})"
+            nombre = mapa[pid]["nombre"] if pid in mapa else f"Producto eliminado (ID {pid})"
             print(f"- {nombre}: {info['cantidad']} unid. | ingresos: ${info['ingresos']}")
 
     print(f"\n--- Stock bajo (≤ {stock_bajo}) ---")

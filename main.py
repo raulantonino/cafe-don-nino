@@ -13,7 +13,7 @@ from modulos.gestion_datos import (
 )
 from modulos.reportes import estado_stock, resumen_ventas
 from modulos.validaciones import confirmar
-from modulos.utiles import mostrar_carta, pausa
+from modulos.funciones_utiles import mostrar_carta, pausa
 
 STOCK_BAJO = 5
 
