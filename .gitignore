@@ -1,10 +1,2 @@
-# Python
 __pycache__/
 *.pyc
-
-# Entornos
-.venv/
-venv/
-
-# VS Code
-.vscode/
